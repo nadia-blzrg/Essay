@@ -1,0 +1,7 @@
+Ce dossier constitue l'API de prediction de malware qui contient:
+
+app.py: le script python-flask de l'api
+model.pkl: le modèle de macine learning sérialisé
+requirements.txt et procfile: fichier deconfiguration requis par l'hebergeur Heroku
+
+ce dossier doit etre mis sur github afin d'etre transférer sur heroku et pour l'hébergement
