@@ -1,34 +1,38 @@
 import numpy as np
 from flask import Flask, request, jsonify, render_template
-import joblib
+import pickle
 
-#instancier un objet Flask
 app = Flask(__name__)
-#désserialisation du modèle
-model = joblib.load("model.pkl")
+model = pickle.load(open('model.pkl', 'rb'))
 
 @app.route('/')
-def index():
+def home():
     return render_template('index.html')
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict',methods=['POST'])
 def predict():
-    #charger le modèle 
-    model = joblib.load("model.pkl")
-    json_ = request.get_json(force=True)
-    #recuperer la chaine de caractères qui forme les permissions
-    permissions_str = json_['permissions']
-    #recuperer les permissions sous forme de liste et la transformer en array
-    permissions_car = permissions_str.split(',')#les 0 et 1 permissions sont séparées par des ','
-    permissions_list = [int(x) for x in permissions_car]
-    permissions = np.array([permissions_list])
-    #passer les permission au modèle et récuperer la prédiction
-    prediction = model.predict(permissions)[0]
-    #envoyer la prédiction sous format JSON
-    return jsonify({'prediction':str(prediction)})
-        
-if __name__ == '__main__':
-    app.run()
+    '''
+    For rendering results on HTML GUI
+    '''
+    int_features = [int(x) for x in request.form.values()]
+    final_features = [np.array(int_features)]
+    prediction = model.predict(final_features)
 
-        
+    output = round(prediction[0], 2)
+
+    return render_template('index.html', prediction_text='Employee Salary should be $ {}'.format(output))
+
+@app.route('/predict_api',methods=['POST'])
+def predict_api():
+    '''
+    For direct API calls trought request
+    '''
+    data = request.get_json(force=True)
+    prediction = model.predict([np.array(list(data.values()))])
+
+    output = prediction[0]
+    return jsonify(output)
+
+if __name__ == "__main__":
+    app.run(debug=True)
         
