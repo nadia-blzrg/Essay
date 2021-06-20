@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, render_template
 import joblib
 
 app = Flask(__name__)
-model = joblib.load("model_ensemble.pkl")
+model = joblib.load("model.pkl")
 
 @app.route('/')
 def home():
